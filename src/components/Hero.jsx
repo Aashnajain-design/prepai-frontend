@@ -1,6 +1,7 @@
+import './Hero.css';
 function Hero() {
     return (
-       <div className="hero">
+       <div className="Hero">
             <h1>Welcome to prepAi</h1>
             <p>Your AI-powered preparation assistant</p>
         </div>

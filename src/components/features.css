@@ -1,0 +1,21 @@
+.features{
+    text-align: center;
+    padding: 60px 40px;
+}
+.features h2{
+  
+    margin-bottom: 20px;
+}
+.feature-cards{
+    display: flex;
+    justify-content: center;
+   
+    gap: 20px;
+}
+.feature-cards p{
+    background-color: #f1f5f9;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
