@@ -1,23 +1,29 @@
 import { useState } from "react";
+import axios from "axios";
+
 function SignUp(){
-    const [formData , setFormData] = useState({
-        name:"",
-        email:"",
-        password:""
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: ""
     })
 
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        })
+    }
 
- const handleChange = (e) =>{
-    setFormData({
-        ...formData,
-        [e.target.name]: e.target.value
-    })
- }
-
- const handleSubmit = (e) =>{
-    e.preventDefault();
-    console.log(formData);
- }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:5000/api/signup', formData);
+            console.log(response.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
  return(
     <div className="signup-container">
         <form onSubmit={handleSubmit}>
