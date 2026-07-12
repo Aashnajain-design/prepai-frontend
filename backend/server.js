@@ -1,15 +1,19 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const User = require('./models/User');   // naya import
-const bcrypt = require('bcrypt');  // naya import
+const User = require('./models/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-mongoose.connect('mongodb://localhost:27017/prepai')
+mongoose.connect(process.env.MONGO_URI, )
   .then(() => console.log('MongoDB connected!'))
   .catch((err) => console.log('MongoDB connection error:', err));
 
@@ -17,10 +21,12 @@ app.get('/', (req, res) => {
     res.send('server is running...');
 })
 
+// SIGNUP ROUTE
 app.post('/api/signup', async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = new User({ name, email, password: hashedPassword });
         await newUser.save();
 
@@ -31,6 +37,39 @@ app.post('/api/signup', async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Signup failed', error: err.message });
+    }
+})
+
+// LOGIN ROUTE
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, email: user.email }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ 
+            message: 'Login successful', 
+            token, 
+            user: { name: user.name, email: user.email } 
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Login failed', error: err.message });
     }
 })
 
