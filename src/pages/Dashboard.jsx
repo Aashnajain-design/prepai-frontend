@@ -6,21 +6,25 @@ function Dashboard(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/dashboard'); 
-                setData(response.data);
-            }
-            catch (err) {
-                setError('Failed to fetch dashboard data');
-            }
-            finally {
-                setLoading(false);
-            }
-        };
-        fetchDashboardData();
-    }, []);
+   useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setData(response.data);
+    } catch (err) {
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDashboardData();
+}, []);
     if(loading) return <p>Loading...</p>
     if(error) return <p>{error}</p>
     return(

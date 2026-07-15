@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const verifyToken = require('./middleware/authMiddleware');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -72,10 +72,10 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Login failed', error: err.message });
     }
 })
-app.get('/api/dashboard', async (req, res) => {
+app.get('/api/dashboard', verifyToken, async (req, res) => {
   try {
     res.json({ 
-      message: 'Welcome to your dashboard!',
+      message: `Welcome to your dashboard, ${req.user.email}!`,
       stats: {
         interviewsCompleted: 0,
         resumeScore: 0
@@ -85,7 +85,6 @@ app.get('/api/dashboard', async (req, res) => {
     res.status(500).json({ message: 'Error fetching dashboard data' });
   }
 });
-
 app.listen(PORT, () => {
     console.log(`server is running on http://localhost:${PORT}`);
 });
