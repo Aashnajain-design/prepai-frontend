@@ -72,6 +72,19 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Login failed', error: err.message });
     }
 })
+app.get('/api/dashboard', async (req, res) => {
+  try {
+    res.json({ 
+      message: 'Welcome to your dashboard!',
+      stats: {
+        interviewsCompleted: 0,
+        resumeScore: 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching dashboard data' });
+  }
+});
 
 app.listen(PORT, () => {
     console.log(`server is running on http://localhost:${PORT}`);
