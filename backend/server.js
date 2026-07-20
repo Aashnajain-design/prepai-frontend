@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('./middleware/authMiddleware');
 const multer = require('multer');
+const Resume = require('./models/Resume');
 
 const app = express();
 
@@ -102,12 +103,23 @@ app.get('/api/dashboard', verifyToken, async (req, res) => {
 });
 
 // RESUME UPLOAD ROUTE
-app.post('/api/upload-resume', upload.single('resume'), (req, res) => {
-  console.log(req.file);
+app.post('/api/upload-resume', verifyToken, upload.single('resume'), async (req, res) => {
+    try{
+        const newResume = new Resume({
+            user: req.user.userId,
+            filename: req.file.filename
+        });
+        await newResume.save();
+    
+  
   res.json({ 
     message: 'Resume uploaded successfully!',
     filename: req.file.filename 
   });
+}
+catch (err) {
+    res.status(500).json({ message: 'Resume upload failed', error: err.message });
+}
 });
 
 app.listen(PORT, () => {

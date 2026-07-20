@@ -16,7 +16,12 @@ function ResumeUpload() {
         formData.append('resume', file);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/upload-resume', formData);
+            const token = localStorage.getItem('token');
+            const response = await axios.post('http://localhost:5000/api/upload-resume', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setMessage(response.data.message);
         } catch (err) {
             console.log(err);
