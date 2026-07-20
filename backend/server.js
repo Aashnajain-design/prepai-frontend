@@ -7,13 +7,26 @@ const User = require('./models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('./middleware/authMiddleware');
+const multer = require('multer');
+
 const app = express();
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI, )
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected!'))
   .catch((err) => console.log('MongoDB connection error:', err));
 
@@ -72,6 +85,8 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Login failed', error: err.message });
     }
 })
+
+// DASHBOARD ROUTE (protected)
 app.get('/api/dashboard', verifyToken, async (req, res) => {
   try {
     res.json({ 
@@ -85,6 +100,16 @@ app.get('/api/dashboard', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Error fetching dashboard data' });
   }
 });
+
+// RESUME UPLOAD ROUTE
+app.post('/api/upload-resume', upload.single('resume'), (req, res) => {
+  console.log(req.file);
+  res.json({ 
+    message: 'Resume uploaded successfully!',
+    filename: req.file.filename 
+  });
+});
+
 app.listen(PORT, () => {
     console.log(`server is running on http://localhost:${PORT}`);
 });
