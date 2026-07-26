@@ -4,6 +4,7 @@ import axios from "axios";
 function ResumeUpload() {
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState("");
+    const[preview , setPreview] = useState("");
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -23,6 +24,7 @@ function ResumeUpload() {
                 }
             });
             setMessage(response.data.message);
+            setPreview(response.data.textPreview);
         } catch (err) {
             console.log(err);
             setMessage('Upload failed');
@@ -37,6 +39,7 @@ function ResumeUpload() {
                 <button type="submit">Upload</button>
             </form>
             {message && <p>{message}</p>}
+            {preview  && <p> <strong>Preview:</strong> {preview}</p>}
         </div>
     );
 }

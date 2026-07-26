@@ -9,7 +9,11 @@ const jwt = require('jsonwebtoken');
 const verifyToken = require('./middleware/authMiddleware');
 const multer = require('multer');
 const Resume = require('./models/Resume');
-
+const pdfParse = require('pdf-parse');
+const fs = require('fs');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 
 const storage = multer.diskStorage({
@@ -105,21 +109,65 @@ app.get('/api/dashboard', verifyToken, async (req, res) => {
 // RESUME UPLOAD ROUTE
 app.post('/api/upload-resume', verifyToken, upload.single('resume'), async (req, res) => {
     try{
+        const filePath = `uploads/${req.file.filename}`;
+        const fileBuffer = fs.readFileSync(filePath);
+        const pdfData = await pdfParse(fileBuffer);
+        
         const newResume = new Resume({
             user: req.user.userId,
-            filename: req.file.filename
+            filename: req.file.filename,
+            extractedText: pdfData.text
         });
         await newResume.save();
     
   
   res.json({ 
     message: 'Resume uploaded successfully!',
-    filename: req.file.filename 
+    textPreview: pdfData.text.substring(0, 200)
   });
 }
 catch (err) {
+    console.log(err);
     res.status(500).json({ message: 'Resume upload failed', error: err.message });
 }
+});
+
+app.post('/api/analyze-resume/:resumeId', verifyToken, rateLimiter(5 , 0.017) , async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.resumeId);
+    
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const prompt = `You are an experienced HR recruiter. Analyze the following resume and provide feedback in this exact format:
+
+Strengths:
+- (list 3 strengths)
+
+Weaknesses:
+- (list 3 weaknesses)
+
+Suggestions:
+- (list 3 suggestions for improvement)
+
+Resume text:
+${resume.extractedText}`;
+
+    const result = await model.generateContent(prompt);
+    const analysisText = result.response.text();
+
+    res.json({ 
+      message: 'Analysis complete',
+      analysis: analysisText 
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Analysis failed', error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
