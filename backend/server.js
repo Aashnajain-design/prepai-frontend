@@ -15,6 +15,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
+const Interview = require('./models/Interview');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -167,6 +168,44 @@ ${resume.extractedText}`;
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Analysis failed', error: err.message });
+  }
+});
+
+
+app.post('/api/interview/start/:resumeId', verifyToken, async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.resumeId);
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const prompt = `You are an interviewer conducting a mock interview. Based on the following resume, ask ONE relevant technical or behavioral interview question. Just give the question directly, no extra text.
+
+Resume text:
+${resume.extractedText}`;
+
+    const result = await model.generateContent(prompt);
+    const questionText = result.response.text();
+
+    const newInterview = new Interview({
+      user: req.user.userId,
+      questions: [
+        { question: questionText, answer: '', feedback: '' }
+      ]
+    });
+    await newInterview.save();
+
+    res.json({ 
+      message: 'Interview started',
+      interviewId: newInterview._id,
+      question: questionText
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Failed to start interview', error: err.message });
   }
 });
 
