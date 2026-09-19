@@ -4,10 +4,9 @@ function Navbar() {
     return (
         <nav className="navbar">
             <h2>prepAi</h2>
-            <div className="links">
+            <div className="nav-links">
                 <a href="#features">Features</a>
                 <a href="/login">Login</a>
-                
             </div>
         </nav>
     );

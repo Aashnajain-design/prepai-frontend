@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import "./Signup.css";
+import Navbar from "../components/Navbar";
 
 function SignUp(){
     const [formData, setFormData] = useState({
@@ -24,36 +26,44 @@ function SignUp(){
             console.log(err);
         }
     }
+
  return(
-    <div className="signup-container">
-        <form onSubmit={handleSubmit}>
-        <h2>Create Account </h2>
+    <>
+      <Navbar />
+      <div className="signup-container">
+          <form onSubmit={handleSubmit}>
+          <h2>Create Account</h2>
+          <p className="signup-subtitle">Start your placement prep journey today</p>
 
-        <input
-        type="text"
-        name="name"
-        placeholder=" Full Name"
-        value={formData.name}
-        onChange={handleChange}
-        />
-        <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-        />
-        <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        />
-       <button type = "submit">Sign Up</button>
-       </form>
-       </div>
+          <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          />
+          <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          />
+          <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          />
+         <button type="submit">Sign Up</button>
+
+         <p className="signup-footer">
+           Already have an account? <a href="/login">Login</a>
+         </p>
+         </form>
+         </div>
+    </>
  )
-
 }
 export default SignUp;

@@ -11,8 +11,8 @@ const multer = require('multer');
 const Resume = require('./models/Resume');
 const pdfParse = require('pdf-parse');
 const fs = require('fs');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { GoogleGenAI } = require('@google/genai');
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 const Interview = require('./models/Interview');
@@ -133,15 +133,14 @@ catch (err) {
 }
 });
 
-app.post('/api/analyze-resume/:resumeId', verifyToken, rateLimiter(5 , 0.017) , async (req, res) => {
+// RESUME ANALYSIS ROUTE
+app.post('/api/analyze-resume/:resumeId', verifyToken, rateLimiter(5, 0.017), async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.resumeId);
     
     if (!resume) {
       return res.status(404).json({ message: 'Resume not found' });
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `You are an experienced HR recruiter. Analyze the following resume and provide feedback in this exact format:
 
@@ -157,8 +156,11 @@ Suggestions:
 Resume text:
 ${resume.extractedText}`;
 
-    const result = await model.generateContent(prompt);
-    const analysisText = result.response.text();
+    const result = await genAI.models.generateContent({
+      model: "gemini-flash-latest",
+      contents: prompt
+    });
+    const analysisText = result.text;
 
     res.json({ 
       message: 'Analysis complete',
@@ -171,7 +173,7 @@ ${resume.extractedText}`;
   }
 });
 
-
+// INTERVIEW START ROUTE
 app.post('/api/interview/start/:resumeId', verifyToken, async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.resumeId);
@@ -179,15 +181,16 @@ app.post('/api/interview/start/:resumeId', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Resume not found' });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
     const prompt = `You are an interviewer conducting a mock interview. Based on the following resume, ask ONE relevant technical or behavioral interview question. Just give the question directly, no extra text.
 
 Resume text:
 ${resume.extractedText}`;
 
-    const result = await model.generateContent(prompt);
-    const questionText = result.response.text();
+    const result = await genAI.models.generateContent({
+      model: "gemini-flash-latest",
+      contents: prompt
+    });
+    const questionText = result.text;
 
     const newInterview = new Interview({
       user: req.user.userId,
@@ -209,6 +212,49 @@ ${resume.extractedText}`;
   }
 });
 
+// INTERVIEW ANSWER ROUTE
+app.post('/api/interview/answer/:interviewId', verifyToken, async (req, res) => {
+  try {
+    const { answer } = req.body;
+    const interview = await Interview.findById(req.params.interviewId);
+
+    if (!interview) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+
+    const lastQuestionIndex = interview.questions.length - 1;
+    const currentQuestion = interview.questions[lastQuestionIndex].question;
+
+    const evaluationPrompt = `You are an interviewer evaluating a candidate's answer. 
+
+Question asked: ${currentQuestion}
+Candidate's answer: ${answer}
+
+Provide brief, constructive feedback (2-3 sentences) on this answer.`;
+
+    const result = await genAI.models.generateContent({
+      model: "gemini-flash-latest",
+      contents: evaluationPrompt
+    });
+    const feedbackText = result.text;
+
+    interview.questions[lastQuestionIndex].answer = answer;
+    interview.questions[lastQuestionIndex].feedback = feedbackText;
+    await interview.save();
+
+    res.json({ 
+      message: 'Answer evaluated',
+      feedback: feedbackText
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Failed to evaluate answer', error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
     console.log(`server is running on http://localhost:${PORT}`);
 });
+
+console.log('API Key loaded:', process.env.GEMINI_API_KEY ? 'Yes' : 'No');
