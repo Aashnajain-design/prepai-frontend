@@ -1,0 +1,80 @@
+.dashboard-container {
+  min-height: calc(100vh - 80px);
+  padding: 48px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  background: linear-gradient(135deg, #e0e7ff, #c4b5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(196, 181, 253, 0.15);
+  border-radius: 10px;
+  color: #c4c3e0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(196, 181, 253, 0.12);
+  border-radius: 16px;
+  padding: 28px;
+  min-width: 220px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-card .stat-label {
+  color: #8b8aad;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  color: #e9e7fd;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.loading-text, .error-text {
+  text-align: center;
+  color: #8b8aad;
+  padding: 60px;
+  font-size: 15px;
+}

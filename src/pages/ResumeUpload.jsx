@@ -1,10 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import "./ResumeUpload.css";
+import Navbar from "../components/Navbar";
 
 function ResumeUpload() {
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState("");
-    const[preview , setPreview] = useState("");
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -19,12 +20,9 @@ function ResumeUpload() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post('http://localhost:5000/api/upload-resume', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+              headers: { Authorization: `Bearer ${token}` }
             });
             setMessage(response.data.message);
-            setPreview(response.data.textPreview);
         } catch (err) {
             console.log(err);
             setMessage('Upload failed');
@@ -32,15 +30,24 @@ function ResumeUpload() {
     };
 
     return (
-        <div>
-            <h2>Upload Resume</h2>
-            <form onSubmit={handleUpload}>
-                <input type="file" onChange={handleFileChange} accept=".pdf" />
-                <button type="submit">Upload</button>
-            </form>
-            {message && <p>{message}</p>}
-            {preview  && <p> <strong>Preview:</strong> {preview}</p>}
-        </div>
+        <>
+          <Navbar />
+          <div className="upload-container">
+            <div className="upload-card">
+                <h2>Upload Resume</h2>
+                <p className="upload-subtitle">Upload your resume to get AI-powered feedback</p>
+
+                <form onSubmit={handleUpload}>
+                    <div className="file-input-wrapper">
+                        <input type="file" onChange={handleFileChange} accept=".pdf" />
+                    </div>
+                    <button type="submit">Upload</button>
+                </form>
+
+                {message && <p className="upload-message">{message}</p>}
+            </div>
+          </div>
+        </>
     );
 }
 
