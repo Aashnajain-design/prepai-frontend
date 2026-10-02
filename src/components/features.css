@@ -12,10 +12,13 @@
    
     gap: 20px;
 }
-.feature-cards p{
-    background-color: #f1f5f9;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+
+.feature-cards p {
+  background-color: #f1f5f9;
+  padding: 40px 32px;      /* pehle chhota tha, ab bada kiya */
+  border-radius: 12px;
+  width: 280px;              /* pehle 200px tha, ab bada */
+  font-size: 16px;
+  text-align: center;
 }

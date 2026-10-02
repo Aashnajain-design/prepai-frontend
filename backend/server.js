@@ -39,6 +39,26 @@ mongoose.connect(process.env.MONGO_URI)
 app.get('/', (req, res) => {
     res.send('server is running...');
 })
+async function generateWithRetry(prompt, retries = 3) {
+  const models = ["gemini-flash-latest", "gemini-2.0-flash-001"];
+  
+  for (let m = 0; m < models.length; m++) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const result = await genAI.models.generateContent({
+          model: models[m],
+          contents: prompt
+        });
+        return result.text;
+      } catch (err) {
+        if (i === retries - 1 && m === models.length - 1) throw err;
+        if (i === retries - 1) break;
+        const waitTime = Math.pow(2, i) * 1000;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+  }
+}
 
 // SIGNUP ROUTE
 app.post('/api/signup', async (req, res) => {
@@ -156,11 +176,7 @@ Suggestions:
 Resume text:
 ${resume.extractedText}`;
 
-    const result = await genAI.models.generateContent({
-      model: "gemini-flash-latest",
-      contents: prompt
-    });
-    const analysisText = result.text;
+    const analysisText = await generateWithRetry(prompt);
 
     res.json({ 
       message: 'Analysis complete',
@@ -186,11 +202,7 @@ app.post('/api/interview/start/:resumeId', verifyToken, async (req, res) => {
 Resume text:
 ${resume.extractedText}`;
 
-    const result = await genAI.models.generateContent({
-      model: "gemini-flash-latest",
-      contents: prompt
-    });
-    const questionText = result.text;
+    const questionText = await generateWithRetry(prompt);
 
     const newInterview = new Interview({
       user: req.user.userId,
@@ -232,11 +244,7 @@ Candidate's answer: ${answer}
 
 Provide brief, constructive feedback (2-3 sentences) on this answer.`;
 
-    const result = await genAI.models.generateContent({
-      model: "gemini-flash-latest",
-      contents: evaluationPrompt
-    });
-    const feedbackText = result.text;
+    const feedbackText = await generateWithRetry(evaluationPrompt);
 
     interview.questions[lastQuestionIndex].answer = answer;
     interview.questions[lastQuestionIndex].feedback = feedbackText;

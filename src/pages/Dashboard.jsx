@@ -52,7 +52,7 @@ function Dashboard() {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h1>{data.message}</h1>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+         
         </div>
 
         <div className="stats-grid">
