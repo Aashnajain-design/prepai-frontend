@@ -4,7 +4,6 @@ import Signup from './pages/SignUp';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import ResumeUpload from './pages/ResumeUpload';
 import Interview from './pages/Interview';
 import Analysis from './pages/Analysis';
 
@@ -15,15 +14,14 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route path="/resume-upload" element={<ResumeUpload />} />
         <Route path="/interview" element={<Interview />} />
         <Route path="/analysis" element={<Analysis />} />
       </Routes>

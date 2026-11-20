@@ -85,3 +85,47 @@
   line-height: 1.7;
   white-space: pre-wrap;
 }
+.analysis-section-title {
+  color: #c4c3e0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.upload-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.analysis-card input[type="file"] {
+  flex: 1;
+  min-width: 0;
+  color: #c4c3e0;
+  font-size: 14px;
+  padding: 12px;
+  border: 2px dashed rgba(196, 181, 253, 0.25);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.analysis-card .upload-row button {
+  width: auto;
+  padding: 12px 24px;
+}
+
+.upload-message {
+  color: #a7f3d0;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.analysis-divider {
+  border: none;
+  border-top: 1px solid rgba(196, 181, 253, 0.12);
+  margin: 28px 0;
+}

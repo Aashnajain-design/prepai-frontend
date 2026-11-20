@@ -28,13 +28,13 @@ function ResumeSelect({ value, onChange }) {
 
     if (loading) return <p className="resume-empty">Loading resumes...</p>;
 
-    if (resumes.length === 0) {
-        return (
-            <p className="resume-empty">
-                No resumes found. <Link to="/resume-upload">Upload one first</Link>
-            </p>
-        );
-    }
+   if (resumes.length === 0) {
+    return (
+        <p className="resume-empty">
+            No resumes yet. Upload one on the <Link to="/analysis">Resume Analysis</Link> page.
+        </p>
+    );
+}
 
     return (
         <select

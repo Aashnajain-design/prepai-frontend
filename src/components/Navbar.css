@@ -51,3 +51,13 @@
   border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
+.nav-logo {
+  text-decoration: none;
+}
+.navbar {
+  gap: 24px;
+}
+
+.nav-links {
+  flex-wrap: wrap;
+}
