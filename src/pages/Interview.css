@@ -1,0 +1,101 @@
+.interview-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+}
+
+.interview-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(196, 181, 253, 0.15);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(139, 124, 246, 0.1);
+  padding: 48px;
+  width: 520px;
+}
+
+.interview-card h2 {
+  background: linear-gradient(135deg, #e0e7ff, #c4b5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.interview-subtitle {
+  color: #8b8aad;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.interview-question {
+  color: #e9e7fd;
+  font-size: 16px;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border-left: 3px solid #a78bfa;
+}
+
+.interview-feedback {
+  color: #e9e7fd;
+  font-size: 15px;
+  line-height: 1.6;
+  background: rgba(167, 139, 250, 0.06);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.interview-card input,
+.interview-card textarea {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(196, 181, 253, 0.12);
+  border-radius: 10px;
+  font-size: 14px;
+  color: #e9e7fd;
+  font-family: inherit;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+.interview-card input:focus,
+.interview-card textarea:focus {
+  outline: none;
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);
+}
+
+.interview-card button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #8b7cf6, #6d5ce8);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+.interview-card button:hover:not(:disabled) {
+  box-shadow: 0 10px 30px rgba(139, 124, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.interview-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

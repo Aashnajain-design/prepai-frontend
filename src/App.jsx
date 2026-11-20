@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ResumeUpload from './pages/ResumeUpload';
+import Interview from './pages/Interview';
+import Analysis from './pages/Analysis';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           } 
         />
         <Route path="/resume-upload" element={<ResumeUpload />} />
+        <Route path="/interview" element={<Interview />} />
+        <Route path="/analysis" element={<Analysis />} />
       </Routes>
     </BrowserRouter>
   );

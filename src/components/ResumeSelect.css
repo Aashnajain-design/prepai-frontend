@@ -1,0 +1,33 @@
+.resume-select {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(196, 181, 253, 0.12);
+  border-radius: 10px;
+  font-size: 14px;
+  color: #e9e7fd;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.resume-select:focus {
+  outline: none;
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);
+}
+
+.resume-select option {
+  background: #1a1d33;
+  color: #e9e7fd;
+}
+
+.resume-empty {
+  color: #8b8aad;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.resume-empty a {
+  color: #a78bfa;
+  font-weight: 600;
+}

@@ -16,6 +16,7 @@ const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 const Interview = require('./models/Interview');
+const { addJob, getJobStatus } = require('./jobQueue');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -40,7 +41,7 @@ app.get('/', (req, res) => {
     res.send('server is running...');
 })
 async function generateWithRetry(prompt, retries = 3) {
-  const models = ["gemini-flash-latest", "gemini-2.0-flash-001"];
+  const models = ["gemini-flash-latest", "gemini-3.8-flash"];
   
   for (let m = 0; m < models.length; m++) {
     for (let i = 0; i < retries; i++) {
@@ -152,6 +153,21 @@ catch (err) {
     res.status(500).json({ message: 'Resume upload failed', error: err.message });
 }
 });
+app.get('/api/resumes', verifyToken, async (req, res) => {
+  try {
+    const resumes = await Resume.find({
+      user: req.user.userId,
+      extractedText: { $exists: true, $ne: '' }
+    })
+      .select('filename uploadedAt')
+      .sort({ uploadedAt: -1 });
+
+    res.json({ resumes });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Failed to fetch resumes' });
+  }
+});
 
 // RESUME ANALYSIS ROUTE
 app.post('/api/analyze-resume/:resumeId', verifyToken, rateLimiter(5, 0.017), async (req, res) => {
@@ -259,6 +275,48 @@ Provide brief, constructive feedback (2-3 sentences) on this answer.`;
     console.log(err);
     res.status(500).json({ message: 'Failed to evaluate answer', error: err.message });
   }
+});
+app.post('/api/interview/start-queued/:resumeId', verifyToken, async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.resumeId);
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+
+    const jobId = `interview-${Date.now()}`;
+
+    const jobFunction = async () => {
+      const prompt = `You are an interviewer conducting a mock interview. Based on the following resume, ask ONE relevant technical or behavioral interview question. Just give the question directly, no extra text.
+
+Resume text:
+${resume.extractedText}`;
+
+      const questionText = await generateWithRetry(prompt);
+
+      const newInterview = new Interview({
+        user: req.user.userId,
+        questions: [{ question: questionText, answer: '', feedback: '' }]
+      });
+      await newInterview.save();
+
+      return { interviewId: newInterview._id, question: questionText };
+    };
+
+    addJob(jobId, jobFunction);
+
+    res.json({ 
+      message: 'Interview request queued! Check status using jobId.',
+      jobId 
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to queue interview', error: err.message });
+  }
+});
+
+app.get('/api/job-status/:jobId', verifyToken, (req, res) => {
+  const status = getJobStatus(req.params.jobId);
+  res.json(status);
 });
 
 app.listen(PORT, () => {
